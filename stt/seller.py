@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from olist.data import Olist
-from olist.order import Order
+from stt.data import Olist
+from stt.order import Order
 
 
 class Seller:
@@ -19,9 +19,9 @@ class Seller:
         'seller_id', 'seller_city', 'seller_state'
         """
         sellers = self.data['sellers']
-        sellers.drop('seller_zip_code_prefix',
-                     axis=1,
-                     inplace=True)
+        #sellers.drop('seller_zip_code_prefix',
+                     #axis=1,
+                     #inplace=True)
         # There is multiple rows per seller
         sellers.drop_duplicates(inplace=True)
 
@@ -65,13 +65,13 @@ class Seller:
             return days
 
         delay = ship.groupby('seller_id')\
-                    .apply(delay_to_logistic_partner)\
-                    .reset_index()
+                        .apply(delay_to_logistic_partner)\
+                        .reset_index()
         delay.columns = ['seller_id', 'delay_to_carrier']
 
         wait = ship.groupby('seller_id')\
-                   .apply(order_wait_time)\
-                   .reset_index()
+                       .apply(order_wait_time)\
+                       .reset_index()
         wait.columns = ['seller_id', 'wait_time']
 
         df = delay.merge(wait, on='seller_id')

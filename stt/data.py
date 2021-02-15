@@ -16,9 +16,9 @@ class Olist:
         root_dir = os.path.dirname(os.path.dirname(__file__))
 
         # Use os library for Unix vs. Widowns robustness
-        csv_path = os.path.join(root_dir, 'data', 'csv')
+        csv_path = os.path.join(root_dir, 'data')
 
-        file_names = [f for f in os.listdir(csv_path) if f.endswith('.csv')]
+        file_names = [f for f in os.listdir(csv_path)if f.endswith('.csv')]
 
         def key_from_file_name(f):
             if f == 'product_category_name_translation.csv':
@@ -51,9 +51,3 @@ class Olist:
             .merge(items, on='order_id', how='outer')
 
         return matching_table
-
-    def ping(self):
-        """
-        You call ping I print pong.
-        """
-        print('pong')
