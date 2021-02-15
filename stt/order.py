@@ -13,17 +13,12 @@ class Order:
 
     def __init__(self):
         self.data = Olist().get_data()
-        # The constructor of class Order assigns an attribute ".data" to all new instances of Order
-        # i.e Order().data is defined
 
     def get_wait_time(self, is_delivered=True):
         """
-        02-01 > Returns a DataFrame with:
-        [order_id, wait_time, expected_wait_time ,delay_vs_expected]
-        and filtering out non-delivered orders unless specified
+        Add columns for late deliveries
         """
-        # Hint: Within this instance method, you have access to the instance of the class Order in the variable self
-        orders = self.data['orders'].copy() # make sure we don't create a "view" but a copy
+        orders = self.data['orders'].copy()
 
 
         # filter delivered orders
@@ -65,7 +60,7 @@ class Order:
              orders['order_purchase_timestamp']) / np.timedelta64(24, 'h')
 
         return orders[['order_id', 'wait_time', 'expected_wait_time',
-                       'delay_vs_expected', 'order_status']]
+                       'delay_vs_expected', 'order_status','order_delivered_customer_date', 'order_purchase_timestamp']]
 
     def get_review_score(self):
         """
@@ -207,12 +202,6 @@ class Order:
         return order_distance
 
     def get_training_data(self, is_delivered=True, with_distance_seller_customer=False):
-        """
-        02-01 > Returns a clean DataFrame (without NaN), with the following columns:
-        [order_id, wait_time, expected_wait_time, delay_vs_expected,
-        dim_is_five_star, dim_is_one_star, review_score, number_of_products,
-        number_of_sellers, freight_value, distance_customer_seller]
-        """
         # Hint: make sure to re-use your instance methods defined above
         training_set =\
             self.get_wait_time(is_delivered)\
