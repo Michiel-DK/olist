@@ -172,8 +172,8 @@ class Viz:
 
             plt.figure(figsize=(20,30))
             plt.title('Product categories sorted by orders cut due to optimisation', fontsize=20)
-            sns.relplot(x="%pcs_cut", y=cut_prod.index, hue="50%_treshold", size="# items ordered",
-            sizes=(40, 400), alpha=.5, palette="muted",
+            sns.relplot(x="%pcs_cut", y=cut_prod.index, hue="50%_treshold", size="# items ordered",\
+            sizes=(40, 400), alpha=.5, palette="muted",\
             height=12, data=cut_prod.sort_values(by=["50%_treshold",'# items ordered'], ascending=False))
             plt.ylabel('')
             plt.show()
