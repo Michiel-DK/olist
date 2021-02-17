@@ -2,10 +2,13 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 from stt.order import Order
 from stt.profitability import Profitability
 from stt.items import Items
+from stt.geo import Geo
+
 
 class Viz:
 
@@ -19,6 +22,7 @@ class Viz:
             self.sorted_profit = Profitability().cumul_table()
             self.optim_df = Profitability().optim_df()
             self.cut_prod = Items().product_cat_cut()
+            self.geo_map = Geo().geo_map()
 
         def order_viz(self):
             order = self.order
@@ -161,10 +165,40 @@ class Viz:
             cut_prod = self.cut_prod
 
             plt.figure(figsize=(20,30))
+            plt.ylabel('')
+            plt.title('Product categories sorted by orders cut due to optimisation', fontsize=20)
             sns.barplot(data = cut_prod.sort_values(by='%pcs_cut', ascending=False), x = '%pcs_cut', y = cut_prod.index, hue='50%_treshold')
             plt.show()
 
+            plt.title('Product categories sorted by orders cut due to optimisation', fontsize=20)
+            plt.ylabel('')
             sns.relplot(x="%pcs_cut", y=cut_prod.index, hue="50%_treshold", size="# items ordered",
             sizes=(40, 400), alpha=.5, palette="muted",
             height=12, data=cut_prod.sort_values(by=["50%_treshold",'# items ordered'], ascending=False))
             plt.show()
+
+        def geo(self):
+            mp, state_pivot = self.geo_map
+
+            plt.figure(figsize=(20,6))
+            plt.title("Sellers to keep/cut per state")
+            plt.bar(state_pivot.index, state_pivot['keep'], label='Sellers to keep', color='g')
+            plt.bar(state_pivot.index, state_pivot['cut'], bottom=state_pivot['keep'], label='Sellers to cut', color='r')
+            plt.legend(fontsize=15)
+            plt.show()
+
+            fig = px.scatter_geo(mp[mp['cut']!='cut'], lat="geolocation_lat", lon="geolocation_lng",
+                    size="order_id", title="Spread sellers to keep",
+                     scope = 'south america',
+                     opacity = 0.5,
+                     center = {'lat':-19.8, 'lon':-43})
+            fig.update_geos(fitbounds="locations")
+            fig.show()
+
+            fig = px.scatter_geo(mp[mp['cut']=='cut'], lat="geolocation_lat", lon="geolocation_lng",
+                    size="order_id", title="Spread sellers to cut",
+                     scope = 'south america',
+                     opacity = 0.5,
+                     center = {'lat':-19.8, 'lon':-43})
+            fig.update_geos(fitbounds="locations")
+            fig.show()

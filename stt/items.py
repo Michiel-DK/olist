@@ -69,4 +69,4 @@ class Items():
 
         cut_prod = itemprod_pivot.merge(top_orders, on='product_category_name').merge(top_volume, on='product_category_name')
 
-        return cut_prod
+        return cut_prod, itemsproducts
