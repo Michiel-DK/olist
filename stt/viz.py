@@ -170,8 +170,6 @@ class Viz:
             plt.ylabel('')
             plt.show()
 
-            plt.figure(figsize=(20,30))
-            plt.title('Product categories sorted by orders cut due to optimisation', fontsize=20)
             sns.relplot(x="%pcs_cut", y=cut_prod.index, hue="50%_treshold", size="# items ordered",\
             sizes=(40, 400), alpha=.5, palette="muted",\
             height=12, data=cut_prod.sort_values(by=["50%_treshold",'# items ordered'], ascending=False))
@@ -188,6 +186,7 @@ class Viz:
             plt.legend(fontsize=15)
             plt.show()
 
+            plt.figure(figsize=(20,6))
             fig = px.scatter_geo(mp[mp['cut']!='cut'], lat="geolocation_lat", lon="geolocation_lng",
                     size="order_id", title="Spread sellers to keep",
                      scope = 'south america',
@@ -196,6 +195,7 @@ class Viz:
             fig.update_geos(fitbounds="locations")
             fig.show()
 
+            plt.figure(figsize=(20,6))
             fig = px.scatter_geo(mp[mp['cut']=='cut'], lat="geolocation_lat", lon="geolocation_lng",
                     size="order_id", title="Spread sellers to cut",
                      scope = 'south america',
