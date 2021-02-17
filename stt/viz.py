@@ -21,7 +21,7 @@ class Viz:
             self.top_volume = Items().get_top_volume()
             self.sorted_profit = Profitability().cumul_table()
             self.optim_df = Profitability().optim_df()
-            self.cut_prod = Items().product_cat_cut()
+            self.cut_prod, self.itemsproducts = Items().product_cat_cut()
             self.geo_map = Geo().geo_map()
 
         def order_viz(self):
@@ -165,16 +165,17 @@ class Viz:
             cut_prod = self.cut_prod
 
             plt.figure(figsize=(20,30))
-            plt.ylabel('')
             plt.title('Product categories sorted by orders cut due to optimisation', fontsize=20)
             sns.barplot(data = cut_prod.sort_values(by='%pcs_cut', ascending=False), x = '%pcs_cut', y = cut_prod.index, hue='50%_treshold')
+            plt.ylabel('')
             plt.show()
 
+            plt.figure(figsize=(20,30))
             plt.title('Product categories sorted by orders cut due to optimisation', fontsize=20)
-            plt.ylabel('')
             sns.relplot(x="%pcs_cut", y=cut_prod.index, hue="50%_treshold", size="# items ordered",
             sizes=(40, 400), alpha=.5, palette="muted",
             height=12, data=cut_prod.sort_values(by=["50%_treshold",'# items ordered'], ascending=False))
+            plt.ylabel('')
             plt.show()
 
         def geo(self):
