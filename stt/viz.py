@@ -16,6 +16,7 @@ class Viz:
             self.items = Items().product_cat()
             self.top_orders = Items().get_top_orders()
             self.top_volume = Items().get_top_volume()
+            self.sorted_profit = Profitability().cumul_table()
 
 
         def order_viz(self):
@@ -127,4 +128,24 @@ class Viz:
                 summary[i].plot(ax = ax[e], kind='pie', title=f'Split based on {i}', labels=['non-profitable','profitable'],
                       autopct=lambda p: '{:.2f}% ({:.0f})'.format(p,(p/100)*summary[i].sum()))
                 ax[e].set_ylabel('')
+            plt.show()
+
+        def cumul_viz(self):
+
+            sorted_profit = self.sorted_profit
+            plt.figure(figsize=(40,20))
+            plt.title('Cumulative revenue and costs per seller sorted from least to most profitable', fontsize=40)
+            plt.bar(sorted_profit.index, sorted_profit['cum_rev_seller'], label='Revenue sellers', color='r')
+            plt.bar(sorted_profit.index, sorted_profit['cum_rev_orders'], bottom=sorted_profit['cum_rev_seller'], label = 'Revenue orders', color='y')
+            plt.bar(sorted_profit.index, sorted_profit['cum_it_cost'], label='IT cost')
+            plt.bar(sorted_profit.index, sorted_profit['cum_cost_reviews'], bottom=sorted_profit['cum_it_cost'], label = 'Review cost')
+            plt.plot(sorted_profit['cum_profit'], color='black',linewidth=7.0 , linestyle='--', label = 'Profit')
+            plt.xlabel('Sellers', fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.yticks(fontsize=20)
+            plt.ylabel('100k BRL', fontsize=20)
+            plt.grid(b=True, which='major', color='#666666', linestyle='-')
+            plt.minorticks_on()
+            plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
+            plt.legend(fontsize=20)
             plt.show()
