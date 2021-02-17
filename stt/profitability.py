@@ -80,7 +80,6 @@ class Profitability():
         seller_rc['total_rev'] = seller_rc['rev_seller']+seller_rc['rev_orders']
         seller_rc['profit'] = seller_rc['total_rev'] - seller_rc['cost_reviews']
         seller_rc = seller_rc.round(2)
-        #seller_rc = seller_rc.rename(columns={'rev_seller_monthly':'rev_seller','rev_orders_monthly' : 'rev_orders', 'cost reviews':'cost_reviews'})
         seller_rc['profitable'] = seller_rc['profit'].apply(lambda x: 0 if x < 0 else 1)
 
         return seller_rc
@@ -149,5 +148,5 @@ class Profitability():
         new_df['cum_it_cost'] = (round(c * np.sqrt(new_df["cum_orders"]),2))*-1
         new_df['cum_profit'] = round(new_df['cum_rev'] + new_df['cum_it_cost'],2)
 
-        return new_df
+        return new_df, to_cut
 

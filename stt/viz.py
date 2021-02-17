@@ -18,6 +18,7 @@ class Viz:
             self.top_volume = Items().get_top_volume()
             self.sorted_profit = Profitability().cumul_table()
             self.optim_df = Profitability().optim_df()
+            self.cut_prod = Items().product_cat_cut()
 
         def order_viz(self):
             order = self.order
@@ -51,8 +52,8 @@ class Viz:
             plt.show()
 
         def top_category(self):
-            top_cat_orders =  self.top_orders
-            top_cat_volume = self.top_volume
+            top_cat_orders =  self.top_orders[0:14]
+            top_cat_volume = self.top_volume[0:14]
 
             fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(15,10))
             fig.suptitle('Most popular products')
@@ -107,6 +108,7 @@ class Viz:
             plt.show()
 
         def profit_viz(self):
+
             profit = self.profit
 
             profit['profitable_1'] = profit['profitable'].map({0:'Loss',1:'Profit'})
@@ -135,7 +137,7 @@ class Viz:
             if optimisation == 'no':
                 sorted_profit = self.sorted_profit
             else:
-                sorted_profit = self.optim_df
+                sorted_profit, _ = self.optim_df
 
             plt.figure(figsize=(40,20))
             plt.title('Cumulative revenue and costs per seller sorted from least to most profitable', fontsize=40)
@@ -153,4 +155,16 @@ class Viz:
             plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
             plt.legend(fontsize=20)
             plt.ylim([-3000000,3000000])
+            plt.show()
+
+        def cut_products(self):
+            cut_prod = self.cut_prod
+
+            plt.figure(figsize=(20,30))
+            sns.barplot(data = cut_prod.sort_values(by='%pcs_cut', ascending=False), x = '%pcs_cut', y = cut_prod.index, hue='50%_treshold')
+            plt.show()
+
+            sns.relplot(x="%pcs_cut", y=cut_prod.index, hue="50%_treshold", size="# items ordered",
+            sizes=(40, 400), alpha=.5, palette="muted",
+            height=12, data=cut_prod.sort_values(by=["50%_treshold",'# items ordered'], ascending=False))
             plt.show()
