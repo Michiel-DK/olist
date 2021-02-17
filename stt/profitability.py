@@ -23,7 +23,7 @@ class Profitability():
         seller = self.seller
         seller['date_first_sale'] = pd.to_datetime(seller['date_first_sale'].map(lambda x: x.strftime("%Y-%m-%d")))
         seller['date_last_sale'] = pd.to_datetime(seller['date_last_sale'])
-        seller['date_last_sale']=seller['date_last_sale'].map(lambda x: x.strftime("%Y-%m-%d"))
+        seller['date_last_sale'] = seller['date_last_sale'].map(lambda x: x.strftime("%Y-%m-%d"))
         seller['date_last_sale'] = pd.to_datetime(seller['date_last_sale'])
         seller['active_months'] = round((seller['date_last_sale']-seller['date_first_sale'])/datetime.timedelta(days=1)/30,0)
         seller['active_months'] = seller['active_months'].apply(lambda x: 1 if x == 0 else x)
@@ -96,13 +96,14 @@ class Profitability():
         sorted_profit['cum_rev'] = sorted_profit['profit'].cumsum()
         c = 500000/np.sqrt(sorted_profit['n_orders'].sum())
         sorted_profit['cum_it_cost'] = (round(c * np.sqrt(sorted_profit["cum_orders"]),2))*-1
-        sorted_profit['cum_profit'] = round(sorted_profit['cum_rev'] - sorted_profit['cum_it_cost'],2)
+        sorted_profit['cum_profit'] = round(sorted_profit['cum_rev'] + sorted_profit['cum_it_cost'],2)
 
         return sorted_profit
 
 
     def optimisation(self):
         optim_profit = self.cumul_table().copy()
+        optim_profit_c = optim_profit.copy()
 
         length = len(optim_profit)
         ls = []
@@ -115,18 +116,19 @@ class Profitability():
             i += 1
             # recalculate DF
             optim_profit['cum_orders'] = optim_profit['n_orders'].cumsum()
-            optim_profit['cum_rev'] = round(optim_profit['profit'].cumsum(),1)
+            optim_profit['cum_rev_seller'] = optim_profit['rev_seller'].cumsum()
+            optim_profit['cum_rev_orders'] = optim_profit['rev_orders'].cumsum()
+            optim_profit['cum_cost_reviews'] = (optim_profit['cost_reviews'].cumsum())
+            optim_profit['cum_rev'] = optim_profit['profit'].cumsum()
             c = 500000/np.sqrt(optim_profit['n_orders'].sum())
-            optim_profit['it_cost'] = round(c * np.sqrt(optim_profit["n_orders"]),1)
-            optim_profit['cum_it_cost'] = round(c * np.sqrt(optim_profit["cum_orders"]),1)
-            optim_profit['prof/it'] = optim_profit['profit']/optim_profit['it_cost']
-            optim_profit['cum_profit'] = round(optim_profit['cum_rev'] - optim_profit['cum_it_cost'],1)
+            optim_profit['cum_it_cost'] = (round(c * np.sqrt(optim_profit["cum_orders"]),2))
+            optim_profit['cum_profit'] = round(optim_profit['cum_rev'] - optim_profit['cum_it_cost'],2)
 
         optim = pd.DataFrame(ls).rename(columns={0:'seller_id',1:'profit'})
         optim.reset_index(inplace=True)
         optim.rename(columns={'index':'companies to cut'},inplace=True)
 
-        return optim, optim_profit
+        return optim, optim_profit_c
 
     def optim_df(self):
         optim, sorted_profit = self.optimisation()
@@ -134,7 +136,18 @@ class Profitability():
         to_cut = pd.DataFrame(optim[optim.index < optim[optim['profit']==optim['profit'].max()].index[0]]['seller_id'])
         to_cut['cut'] = "cut"
         sorted_profit_cut = sorted_profit.merge(to_cut, on = 'seller_id', how = 'left')
-        new_df = sorted_profit[sorted_profit_cut['cut'] != 'cut']
+        new_df = sorted_profit[sorted_profit_cut['cut'] != 'cut']\
+        .drop(columns=(['cum_orders','cum_rev_seller','cum_rev_orders','cum_cost_reviews',\
+            'cum_rev','cum_it_cost','cum_profit']))
+
+        new_df['cum_orders'] = new_df['n_orders'].cumsum()
+        new_df['cum_rev_seller'] = new_df['rev_seller'].cumsum()
+        new_df['cum_rev_orders'] = new_df['rev_orders'].cumsum()
+        new_df['cum_cost_reviews'] = (new_df['cost_reviews'].cumsum())*-1
+        new_df['cum_rev'] = new_df['profit'].cumsum()
+        c = 500000/np.sqrt(new_df['n_orders'].sum())
+        new_df['cum_it_cost'] = (round(c * np.sqrt(new_df["cum_orders"]),2))*-1
+        new_df['cum_profit'] = round(new_df['cum_rev'] + new_df['cum_it_cost'],2)
 
         return new_df
 

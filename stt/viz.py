@@ -17,7 +17,7 @@ class Viz:
             self.top_orders = Items().get_top_orders()
             self.top_volume = Items().get_top_volume()
             self.sorted_profit = Profitability().cumul_table()
-
+            self.optim_df = Profitability().optim_df()
 
         def order_viz(self):
             order = self.order
@@ -130,9 +130,13 @@ class Viz:
                 ax[e].set_ylabel('')
             plt.show()
 
-        def cumul_viz(self):
+        def cumul_viz(self, optimisation='no'):
 
-            sorted_profit = self.sorted_profit
+            if optimisation == 'no':
+                sorted_profit = self.sorted_profit
+            else:
+                sorted_profit = self.optim_df
+
             plt.figure(figsize=(40,20))
             plt.title('Cumulative revenue and costs per seller sorted from least to most profitable', fontsize=40)
             plt.bar(sorted_profit.index, sorted_profit['cum_rev_seller'], label='Revenue sellers', color='r')
@@ -148,4 +152,5 @@ class Viz:
             plt.minorticks_on()
             plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
             plt.legend(fontsize=20)
+            plt.ylim([-3000000,3000000])
             plt.show()
